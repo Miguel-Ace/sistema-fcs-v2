@@ -29,6 +29,7 @@
                 <tr>
                     <td>-</td>
                     <td>Expediente</td>
+                    <td>Edad</td>
                     <td>Padrino</td>
                     <td>Insumos</td>
                     <td>Fecha</td>
@@ -36,7 +37,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach ($datos as $dato)
+                @foreach ($datos as $key => $dato)
                     <tr>
                         <td>
                             <a href="{{url('/entregas_mensuales/detalle_entregas_mensuales/'.$dato->id)}}" class="btn-acciones"><i class="fa-solid fa-gifts"></i></a>
@@ -46,6 +47,7 @@
                             <a href="{{url('/entregas_mensuales/view/'.$dato->id)}}" class="btn-acciones"><i class="fa-regular fa-eye btn-ico-view"></i></a>
                         </td>
                         <td>{{$dato->expedientes->nombre1}} {{$dato->expedientes->nombre2}} {{$dato->expedientes->apellido1}} {{$dato->expedientes->apellido2}}</td>
+                        <td>{{$edades[$key]}}</td>
                         <td>{{$dato->padrinos->nombre}} {{$dato->padrinos->apellido}}</td>
                         <td>{{$dato->insumos->insumo}}</td>
                         <td>{{$dato->fecha}}</td>

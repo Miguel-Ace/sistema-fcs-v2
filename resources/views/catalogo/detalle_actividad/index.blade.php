@@ -6,10 +6,12 @@
     <div class="encabezado-tabla">
         <p class="titulo"><a href="{{url('/actividades')}}">Actividades</a> / Detalle actividades</p>
         @role('admin|creador')
-        <a href="{{url('/actividades/detalles_actividades/create/'.$id_a)}}" class="btn-cambio-vista btn">
-            <i class="fa-solid fa-plus"></i>
-            Crear Nuevo
-        </a>
+        @if ($hay_cupos)
+            <a href="{{url('/actividades/detalles_actividades/create/'.$id_a)}}" class="btn-cambio-vista btn">
+                <i class="fa-solid fa-plus"></i>
+                Crear Nuevo
+            </a>
+        @endif
         @endrole
     </div>
 

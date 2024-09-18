@@ -51,7 +51,7 @@
                         <td>{{$dato->promedio}}</td>
                         <td>{{$dato->fecha}}</td>
                         <td>{{$dato->grados_escolares->grado_escolar}}</td>
-                        <td>{{$dato->ocupa_tutoria ? 'Sí' : 'No'}}</td>
+                        <td>{{$dato->ocupa_tutorias->ocupa_tutoria}}</td>
                         <td>{{$dato->tipo_promedio}}</td>
                         <td>{{$dato->semaforos->semaforo}}</td>
                         <td>{{$dato->observaciones ? $dato->observaciones : '-'}}</td>

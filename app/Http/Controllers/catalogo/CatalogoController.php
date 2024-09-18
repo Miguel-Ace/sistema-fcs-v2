@@ -49,7 +49,18 @@ use App\Models\Tutor;
 use Illuminate\Support\Facades\Storage;
 
 class CatalogoController extends Controller
-{    
+{
+    // Calcula las edades de los niños si el modelo tiene el expediente
+    public function calcularEdades($datos){
+        $edades = [];
+        foreach ($datos as $dato) {
+            $fechaNacimiento = $dato->expedientes->fecha_nacimiento;
+            $convertirFechaNacimiento = Carbon::parse($fechaNacimiento);
+            $edades[] = floor($convertirFechaNacimiento->diffInYears(Carbon::now()));
+        }
+        return $edades;
+    }
+
     /////// Rol
     public function user_rol_create(Request $request, $user) {
         $usuario = User::find($user);
@@ -649,12 +660,15 @@ class CatalogoController extends Controller
         ->orWhere('observaciones', 'LIKE', "%{$buscar}%")
         ->paginate(20);
 
-        return view('catalogo.entregas_mensuales.index', compact('datos'));
+        $edades = $this->calcularEdades($datos);
+
+        return view('catalogo.entregas_mensuales.index', compact('datos','edades'));
     }
 
     public function entrega_mensual_index() {
         $datos = EntregasMensuale::paginate(20);
-        return view('catalogo.entregas_mensuales.index', compact('datos'));
+        $edades = $this->calcularEdades($datos);
+        return view('catalogo.entregas_mensuales.index', compact('datos','edades'));
     }
 
     public function entrega_mensual_create() {
@@ -666,7 +680,8 @@ class CatalogoController extends Controller
 
     public function entrega_mensual_view($id) {
         $dato = EntregasMensuale::find($id);
-        return view('catalogo.entregas_mensuales.view', compact('dato'));
+        $edad = $this->calcularEdades([$dato]);
+        return view('catalogo.entregas_mensuales.view', compact('dato','edad'));
     }
 
     public function entrega_mensual_edit($id) {
@@ -1999,9 +2014,16 @@ class CatalogoController extends Controller
     }
 
     /////// Detalle Actividades
+    public function cantidad_invitados($datos,$id_a) {
+        $cant_invitados = Actividad::find($id_a)->cantidad_total_invitados;
+        $hay_cupos = count($datos) < $cant_invitados;
+        return $hay_cupos;
+    }
+
     public function detalle_actividad_index($id_a) {
         $datos = DetalleActividad::where('id_actividad',$id_a)->paginate(10);
-        return view('catalogo.detalle_actividad.index', compact('datos','id_a'));
+        $hay_cupos = $this->cantidad_invitados($datos,$id_a);
+        return view('catalogo.detalle_actividad.index', compact('datos','id_a','hay_cupos'));
     }
 
     public function detalle_actividad_create($id_a) {
@@ -2047,7 +2069,12 @@ class CatalogoController extends Controller
     }
 
     public function detalle_actividad_store(Request $request, $id_a, $id_niño, $activo) {
-
+        $datos = DetalleActividad::where('id_actividad',$id_a)->get();
+        $hay_cupos = $this->cantidad_invitados($datos,$id_a);
+        if (!$hay_cupos) {
+            return redirect('actividades/detalles_actividades'.'/'.$id_a);
+        }
+        
         if (!$activo) {
             // Crear el registro en la base de datos
             DetalleActividad::create([
@@ -2211,7 +2238,7 @@ class CatalogoController extends Controller
             'id_semaforo' => $request['id_semaforo'],
         ]);
         
-        $id_nota ? $tutoria->update(['promedio' => $id_nota]) : '';
+        $id_nota ? $tutoria->update(['promedio' => $id_nota]) : $tutoria->update(['promedio' => 0]);
 
         return redirect('/tutorias')->with(['mensaje' => 'Información Creada']);
     }
@@ -2232,6 +2259,8 @@ class CatalogoController extends Controller
         // Agregar 'promedio' solo si tiene un valor
         if ($id_nota) {
             $updateData['promedio'] = $id_nota;
+        }else{
+            $updateData['promedio'] = 0;
         }
     
         // Actualizar la información en la base de datos

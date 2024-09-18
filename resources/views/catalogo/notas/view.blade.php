@@ -37,7 +37,7 @@
                 
                 <div class="detalle">
                     <p class="clave">Ocupa Tutoría:</p>
-                    <p class="valor">{{$dato->ocupa_tutoria ? 'Sí' : 'No'}}</p>
+                    <p class="valor">{{$dato->ocupa_tutorias->ocupa_tutoria}}</p>
                 </div>
                 
                 <div class="detalle">

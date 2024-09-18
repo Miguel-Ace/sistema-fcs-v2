@@ -51,7 +51,7 @@
                 </div>
 
                 <div class="inputs">
-                    <label for="nota" class="encabezado-input">Nota</label>
+                    <label for="nota" class="encabezado-input">Observaciones</label>
                     <input type="text" class="input" name="nota" id="nota" value="{{$dato->nota}}">
                 </div>
             </div>

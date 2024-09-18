@@ -49,7 +49,7 @@
                     <label for="id_ocupa_tutoria" class="encabezado-input">Ocupa Tutoría</label>
                     <select class="input" name="id_ocupa_tutoria" id="id_ocupa_tutoria">
                         @foreach ($ocupar_tutorias as $ocupar_tutoria)
-                            <option value="{{$ocupar_tutoria->id}}" {{ $dato->id_grado_escolar == $ocupar_tutoria->id ? 'selected' : '' }}>{{$ocupar_tutoria->ocupa_tutoria}}</option>
+                            <option value="{{$ocupar_tutoria->id}}" {{ $dato->id_ocupa_tutoria == $ocupar_tutoria->id ? 'selected' : '' }}>{{$ocupar_tutoria->ocupa_tutoria}}</option>
                         @endforeach
                     </select>
                 </div>

@@ -33,7 +33,7 @@
                     <td>Comunidad</td>
                     <td>Promedio</td>
                     <td>Semáforo</td>
-                    <td>Nota</td>
+                    <td>Observaciones</td>
                 </tr>
             </thead>
             <tbody>

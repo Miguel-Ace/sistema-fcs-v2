@@ -41,7 +41,7 @@
                 </div>
 
                 <div class="detalle">
-                    <p class="clave">Nota:</p>
+                    <p class="clave">Observaciones:</p>
                     <p class="valor">{{$dato->nota ?? '-'}}</p>
                 </div>
             </div>

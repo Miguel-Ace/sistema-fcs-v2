@@ -19,6 +19,11 @@
                     <p class="clave">Expediente:</p>
                     <p class="valor">{{$dato->expedientes->nombre1}} {{$dato->expedientes->nombre2}} {{$dato->expedientes->apellido1}} {{$dato->expedientes->apellido2}}</p>
                 </div>
+
+                <div class="detalle">
+                    <p class="clave">Edad:</p>
+                    <p class="valor">{{$edad[0]}}</p>
+                </div>
                 
                 <div class="detalle">
                     <p class="clave">Padrino:</p>
