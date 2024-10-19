@@ -3,6 +3,7 @@
 @extends('layout.plantilla_app')
 
 @section('informacion')
+<div class="caja">
     <div class="encabezado-tabla">
         <p class="titulo">Notas</p>
 
@@ -27,14 +28,14 @@
                 </div>
                 
                 <div class="inputs">
-                    <label for="promedio" class="encabezado-input">Promedio</label>
+                    <label for="promedio" class="encabezado-input">Promedio Ponderado</label>
                     <input type="text" class="input" name="promedio" id="promedio" value="{{$dato->promedio}}">
                 </div>
                 
-                <div class="inputs">
+                {{-- <div class="inputs">
                     <label for="fecha" class="encabezado-input">Fecha</label>
                     <input type="date" class="input" name="fecha" id="fecha" value="{{$dato->fecha}}">
-                </div>
+                </div> --}}
                 
                 <div class="inputs">
                     <label for="id_grado_escolar" class="encabezado-input">Grado Escolar</label>
@@ -54,7 +55,7 @@
                     </select>
                 </div>
                 
-                <div class="inputs">
+                {{-- <div class="inputs">
                     <label for="tipo_promedio" class="encabezado-input">Tipo de Promedio</label>
                     <select class="input @error('tipo_promedio') error @enderror" name="tipo_promedio" id="tipo_promedio">
                         <option value="Excelente" {{ $dato->tipo_promedio == 'Excelente' ? 'selected' : '' }}>Excelente</option>
@@ -62,7 +63,7 @@
                         <option value="Bueno" {{ $dato->tipo_promedio == 'Bueno' ? 'selected' : '' }}>Bueno</option>
                         <option value="Malo" {{ $dato->tipo_promedio == 'Malo' ? 'selected' : '' }}>Malo</option>
                     </select>
-                </div>
+                </div> --}}
                 
                 <div class="inputs">
                     <label for="id_semaforo" class="encabezado-input">Semáforo</label>
@@ -82,4 +83,5 @@
             <button class="btn btn-editar"><i class="fa-solid fa-floppy-disk"></i> Actualizar</button>
         </form>
     </div>
+</div>
 @endsection

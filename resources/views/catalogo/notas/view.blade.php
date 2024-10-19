@@ -3,6 +3,7 @@
 @extends('layout.plantilla_app')
 
 @section('informacion')
+<div class="caja">
     <div class="encabezado-tabla">
         <p class="titulo">Notas</p>
         
@@ -21,14 +22,14 @@
                 </div>
                 
                 <div class="detalle">
-                    <p class="clave">Promedio:</p>
+                    <p class="clave">Promedio Ponderado:</p>
                     <p class="valor">{{$dato->promedio}}</p>
                 </div>
                 
-                <div class="detalle">
+                {{-- <div class="detalle">
                     <p class="clave">Fecha:</p>
                     <p class="valor">{{$dato->fecha}}</p>
-                </div>
+                </div> --}}
                 
                 <div class="detalle">
                     <p class="clave">Grado Escolar:</p>
@@ -40,10 +41,10 @@
                     <p class="valor">{{$dato->ocupa_tutorias->ocupa_tutoria}}</p>
                 </div>
                 
-                <div class="detalle">
+                {{-- <div class="detalle">
                     <p class="clave">Tipo de Promedio:</p>
                     <p class="valor">{{$dato->tipo_promedio}}</p>
-                </div>
+                </div> --}}
                 
                 <div class="detalle">
                     <p class="clave">Semáforo:</p>
@@ -57,4 +58,5 @@
             </div>
         </div>
     </div>
+</div>
 @endsection

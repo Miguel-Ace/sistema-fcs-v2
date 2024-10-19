@@ -11,6 +11,7 @@ export default defineConfig({
                 'resources/css/plantilla_app.css',
                 'resources/css/plantilla_auth.css',
                 'resources/css/catalogo/user.css',
+                'resources/js/app.js',
                 'resources/js/display_load.js',
                 'resources/js/limpiar_errores.js',
                 'resources/js/plantilla_app.js',

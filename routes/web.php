@@ -287,7 +287,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/actividades/detalles_actividades/create/{id_a}', [CatalogoController::class, 'detalle_actividad_create']);
     Route::get('/actividades/detalles_actividades/view/{id}/{id_a}', [CatalogoController::class, 'detalle_actividad_view']);
     Route::get('/actividades/detalles_actividades/{id_a}/edit/{id}', [CatalogoController::class, 'detalle_actividad_edit']);
-    Route::post('/actividades/detalles_actividades/{id_a}/{id_niño}/{activo}', [CatalogoController::class, 'detalle_actividad_store']);
+    // Route::post('/actividades/detalles_actividades/{id_a}/{id_niño}/{activo}', [CatalogoController::class, 'detalle_actividad_store']);
     Route::patch('/actividades/detalles_actividades/{id}/{id_a}', [CatalogoController::class, 'detalle_actividad_update']);
     Route::get('/actividades/detalles_actividades/delete/{id}', [CatalogoController::class, 'detalle_actividad_delete']);
 

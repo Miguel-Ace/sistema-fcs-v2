@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('fecha_inicio')->nullable();
             $table->string('fecha_final')->nullable();
             $table->string('fecha_nacimiento')->nullable();
+            $table->string('mes_nacimiento')->nullable();
             $table->bigInteger('id_provincia')->unsigned()->nullable();
             $table->bigInteger('id_canton')->unsigned()->nullable();
             $table->bigInteger('id_barrio')->unsigned()->nullable();

@@ -3,6 +3,7 @@
 @extends('layout.plantilla_app')
 
 @section('informacion')
+<div class="caja">
     <div class="encabezado-tabla">
         <p class="titulo">Padrinos</p>
 
@@ -73,6 +74,18 @@
                 </div>
                 
                 <div class="inputs">
+                    <label for="mes_nacimiento" class="encabezado-input">Mes de Nacimiento</label>
+                    <select class="input @error('mes_nacimiento') error @enderror" name="mes_nacimiento" id="mes_nacimiento">
+                        <option value="" selected disabled>Seleccione un mes</option>
+                        @foreach ($meses as $mes)
+                            <option value="{{ $mes }}" {{ old('mes_nacimiento') == $mes ? 'selected' : '' }}>
+                                {{ $mes}}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="inputs">
                     <label for="id_metodo_pago" class="encabezado-input">Método de Pago</label>
                     <select class="input @error('id_metodo_pago') error @enderror" name="id_metodo_pago" id="id_metodo_pago">
                         @foreach ($metodos_pagos as $metodo_pago)
@@ -98,4 +111,5 @@
             <button class="btn btn-guardar"><i class="fa-solid fa-floppy-disk"></i> Guardar</button>
         </form>
     </div>
+</div>
 @endsection

@@ -40,6 +40,7 @@ return new class extends Migration
             $table->bigInteger('id_centro_educativo')->unsigned()->nullable();
             $table->bigInteger('id_padrino')->unsigned()->nullable();
             $table->bigInteger('id_beca')->unsigned()->nullable();
+            $table->bigInteger('edad')->nullable();
             $table->timestamps();
 
 

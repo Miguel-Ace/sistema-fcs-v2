@@ -3,6 +3,7 @@
 @extends('layout.plantilla_app')
 
 @section('informacion')
+<div class="caja">
     <div class="encabezado-tabla">
         <p class="titulo"><a href="{{url('/entregas_mensuales')}}">Entregas mensuales</a> / Detalle actividades</p>
         @role('admin|creador')
@@ -41,4 +42,5 @@
 
         <div class="paginador">{{ $datos->links() }}</div>
     </div>
+</div>
 @endsection

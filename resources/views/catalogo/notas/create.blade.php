@@ -2,7 +2,7 @@
 
 @extends('layout.plantilla_app')
 
-@section('informacion')
+
     <div class="encabezado-tabla">
         <p class="titulo">Notas</p>
 
@@ -26,14 +26,14 @@
                 </div>
                 
                 <div class="inputs">
-                    <label for="promedio" class="encabezado-input">Promedio</label>
+                    <label for="promedio" class="encabezado-input">Promedio Ponderado</label>
                     <input type="text" class="input @error('promedio') error @enderror" name="promedio" id="promedio" value="{{ old('promedio') }}">
                 </div>
                 
-                <div class="inputs">
+                {{-- <div class="inputs">
                     <label for="fecha" class="encabezado-input">Fecha</label>
                     <input type="date" class="input @error('fecha') error @enderror" name="fecha" id="fecha" value="{{ old('fecha') }}">
-                </div>
+                </div> --}}
                 
                 <div class="inputs">
                     <label for="id_grado_escolar" class="encabezado-input">Grado Escolar</label>
@@ -53,7 +53,7 @@
                     </select>
                 </div>
                 
-                <div class="inputs">
+                {{-- <div class="inputs">
                     <label for="tipo_promedio" class="encabezado-input">Tipo de Promedio</label>
                     <select class="input @error('tipo_promedio') error @enderror" name="tipo_promedio" id="tipo_promedio">
                         <option value="Excelente" {{ old('tipo_promedio') == 'Excelente' ? 'selected' : '' }}>Excelente</option>
@@ -61,7 +61,7 @@
                         <option value="Bueno" {{ old('tipo_promedio') == 'Bueno' ? 'selected' : '' }}>Bueno</option>
                         <option value="Malo" {{ old('tipo_promedio') == 'Malo' ? 'selected' : '' }}>Malo</option>
                     </select>
-                </div>
+                </div> --}}
                 
                 <div class="inputs">
                     <label for="id_semaforo" class="encabezado-input">Semáforo</label>

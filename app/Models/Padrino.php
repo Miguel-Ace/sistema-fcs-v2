@@ -23,6 +23,7 @@ class Padrino extends Model
         'fecha_inicio',
         'fecha_final',
         'fecha_nacimiento',
+        'mes_nacimiento',
         'id_provincia',
         'id_canton',
         'id_barrio',

@@ -3,6 +3,7 @@
 @extends('layout.plantilla_app')
 
 @section('informacion')
+<div class="caja">
     <div class="encabezado-tabla">
         <p class="titulo">Tutorias</p>
 
@@ -47,4 +48,5 @@
             </div>
         </div>
     </div>
+</div>
 @endsection

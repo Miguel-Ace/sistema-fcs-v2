@@ -3,6 +3,7 @@
 @extends('layout.plantilla_app')
 
 @section('informacion')
+<div class="caja">
     <div class="encabezado-tabla">
         <p class="titulo"><a href="{{url('/actividades')}}">Actividades</a> / Detalle actividades : {{$dato->expedientes->nombre1}} {{$dato->expedientes->nombre2}} {{$dato->expedientes->apellido1}} {{$dato->expedientes->apellido2}}</p>
 
@@ -35,4 +36,5 @@
             <button class="btn btn-editar"><i class="fa-solid fa-floppy-disk"></i> Actualizar</button>
         </form>
     </div>
+</div>
 @endsection

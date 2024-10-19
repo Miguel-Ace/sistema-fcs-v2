@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Control-Contratistas</title>
-    @vite(['resources/css/display_load.css','resources/css/general.css','resources/css/plantilla_app.css','resources/js/plantilla_app.js'])
+    @vite(['resources/css/display_load.css','resources/css/general.css','resources/css/plantilla_app.css','resources/js/plantilla_app.js','resources/js/app.js'])
     <link href="https://unpkg.com/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
 </head>
 <body>

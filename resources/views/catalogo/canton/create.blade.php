@@ -3,6 +3,7 @@
 @extends('layout.plantilla_app')
 
 @section('informacion')
+<div class="caja">
     <div class="encabezado-tabla">
         <p class="titulo">Cantones</p>
 
@@ -34,4 +35,5 @@
             <button class="btn btn-guardar"><i class="fa-solid fa-floppy-disk"></i> Guardar</button>
         </form>
     </div>
+</div>
 @endsection

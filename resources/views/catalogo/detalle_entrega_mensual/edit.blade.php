@@ -3,6 +3,7 @@
 @extends('layout.plantilla_app')
 
 @section('informacion')
+<div class="caja">
     <div class="encabezado-tabla">
         <p class="titulo"><a href="{{url('/entregas_mensuales')}}">Entregas mensuales</a> / Detalle actividades</p>
 
@@ -30,4 +31,5 @@
             <button class="btn btn-editar"><i class="fa-solid fa-floppy-disk"></i> Actualizar</button>
         </form>
     </div>
+</div>
 @endsection

@@ -38,6 +38,7 @@ class Expediente extends Model
         'id_centro_educativo',
         'id_padrino',
         'id_beca',
+        'edad',
     ];
 
     function becas(){

@@ -3,6 +3,7 @@
 @extends('layout.plantilla_app')
 
 @section('informacion')
+<div class="caja">
     <div class="encabezado-tabla">
         <p class="titulo">Grados escolares</p>
         
@@ -22,4 +23,5 @@
             </div>
         </div>
     </div>
+</div>
 @endsection

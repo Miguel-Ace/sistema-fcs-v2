@@ -3,6 +3,7 @@
 @extends('layout.plantilla_app')
 
 @section('informacion')
+<div class="caja">
     <div class="encabezado-tabla">
         <p class="titulo">
             @role('admin')
@@ -58,4 +59,5 @@
             </tbody>
         </table>
     </div>
+</div>
 @endsection

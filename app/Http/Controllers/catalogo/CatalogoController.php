@@ -142,70 +142,8 @@ class CatalogoController extends Controller
     }
 
     /////// Expediente
-    public function expediente_buscador_index(Request $request) {
-        $buscar = $request->buscar;
-
-        $datos = Expediente::with(['becas','activos','sexos','comunidades','estados','tipo_pobrezas','barrios','grados_escolares','centro_educativos','padrinos'])
-        ->where('codigo_nino', 'LIKE', "%{$buscar}%")
-        ->orWhereHas('comunidades', function ($query) use ($buscar) {
-            $query->where('comunidad', 'LIKE', "%{$buscar}%");
-        })
-        ->orWhereHas('becas', function ($query) use ($buscar) {
-            $query->where('beca', 'LIKE', "%{$buscar}%");
-        })
-        ->orWhereHas('activos', function ($query) use ($buscar) {
-            $query->where('activo', 'LIKE', "%{$buscar}%");
-        })
-        ->orWhereHas('sexos', function ($query) use ($buscar) {
-            $query->where('sexo', 'LIKE', "%{$buscar}%");
-        })
-        ->orWhereHas('estados', function ($query) use ($buscar) {
-            $query->where('estado', 'LIKE', "%{$buscar}%");
-        })
-        ->orWhereHas('tipo_pobrezas', function ($query) use ($buscar) {
-            $query->where('tipo_pobreza', 'LIKE', "%{$buscar}%");
-        })
-        ->orWhereHas('barrios', function ($query) use ($buscar) {
-            $query->where('barrio', 'LIKE', "%{$buscar}%");
-        })
-        ->orWhereHas('grados_escolares', function ($query) use ($buscar) {
-            $query->where('grado_escolar', 'LIKE', "%{$buscar}%");
-        })
-        ->orWhereHas('centro_educativos', function ($query) use ($buscar) {
-            $query->where('centro_educativo', 'LIKE', "%{$buscar}%");
-        })
-        ->orWhereHas('padrinos', function ($query) use ($buscar) {
-            $terms = explode(' ', $buscar); // Divide el término de búsqueda en palabras
-            $query->where(function ($query) use ($terms) {
-                foreach ($terms as $term) {
-                    $query->where(function ($query) use ($term) {
-                        $query->where('nombre', 'LIKE', "%{$term}%")
-                              ->orWhere('apellido', 'LIKE', "%{$term}%");
-                    });
-                }
-            });
-        })
-        ->orWhere('nombre1', 'LIKE', "%{$buscar}%")
-        ->orWhere('nombre2', 'LIKE', "%{$buscar}%")
-        ->orWhere('apellido1', 'LIKE', "%{$buscar}%")
-        ->orWhere('apellido2', 'LIKE', "%{$buscar}%")
-        ->orWhere('pp', 'LIKE', "%{$buscar}%")
-        ->orWhere('cedula', 'LIKE', "%{$buscar}%")
-        ->orWhere('fecha_nacimiento', 'LIKE', "%{$buscar}%")
-        ->orWhere('contacto_representante', 'LIKE', "%{$buscar}%")
-        ->orWhere('talla_pantalon', 'LIKE', "%{$buscar}%")
-        ->orWhere('talla_camisa', 'LIKE', "%{$buscar}%")
-        ->orWhere('talla_zapato', 'LIKE', "%{$buscar}%")
-        ->orWhere('nombre_encargado', 'LIKE', "%{$buscar}%")
-        ->orWhere('telefono_encargado', 'LIKE', "%{$buscar}%")
-        ->paginate(10);
-
-        return view('catalogo.expediente.index', compact('datos'));
-    }
-
     public function expediente_index() {
-        $datos = Expediente::paginate(20);
-        return view('catalogo.expediente.index', compact('datos'));
+        return view('catalogo.expediente.index');
     }
 
     public function expediente_create() {
@@ -272,8 +210,12 @@ class CatalogoController extends Controller
         // Crear el registro en la base de datos
         $expediente = Expediente::create($request->all());
 
+        $fechaCarbon = Carbon::parse($expediente->fecha_nacimiento);
         // Actualizar el campo 'codigo_nino'
-        $expediente->update(['codigo_nino' => 'FCS'.$expediente->id.date('Y')]);
+        $expediente->update([
+            'codigo_nino' => 'FCS'.$expediente->id.date('Y'),
+            'edad' => $fechaCarbon->age,
+        ]);
         
         return redirect('/expedientes')->with(['mensaje' => 'Información Creada']);
     }
@@ -281,6 +223,8 @@ class CatalogoController extends Controller
     public function expediente_update(Request $request, $id) {
         $expediente = Expediente::find($id);
         
+        $fechaCarbon = Carbon::parse($expediente->fecha_nacimiento);
+
         $expediente->update([
             'id_comunidad' => $request['id_comunidad'] ? $request['id_comunidad'] : $expediente['id_comunidad'],
             'nombre1' => $request['nombre1'] ? $request['nombre1'] :$expediente['nombre1'],
@@ -305,48 +249,15 @@ class CatalogoController extends Controller
             'id_centro_educativo' => $request['id_centro_educativo'] ? $request['id_centro_educativo'] : $expediente['id_centro_educativo'],
             'id_padrino' => $request['id_padrino'] ? $request['id_padrino'] : $expediente['id_padrino'],
             'id_beca' => $request['id_beca'] ? $request['id_beca'] : $expediente['id_beca'],
+            'edad' => $fechaCarbon->age
         ]);
         
         return redirect('/expedientes')->with(['mensaje' => 'Información Actualizada']);
     }
 
     /////// Padrinos
-    public function padrino_buscador_index(Request $request) {
-        $buscar = $request->buscar;
-
-        $datos = Padrino::with(['provincias','cantones','barrios','metodos_pagos','bancos'])
-        ->where('nombre', 'LIKE', "%{$buscar}%")
-        ->orWhereHas('provincias', function ($query) use ($buscar) {
-            $query->where('provincia', 'LIKE', "%{$buscar}%");
-        })
-        ->orWhereHas('cantones', function ($query) use ($buscar) {
-            $query->where('canton', 'LIKE', "%{$buscar}%");
-        })
-        ->orWhereHas('barrios', function ($query) use ($buscar) {
-            $query->where('barrio', 'LIKE', "%{$buscar}%");
-        })
-        ->orWhereHas('metodos_pagos', function ($query) use ($buscar) {
-            $query->where('metodo_pago', 'LIKE', "%{$buscar}%");
-        })
-        ->orWhereHas('bancos', function ($query) use ($buscar) {
-            $query->where('banco', 'LIKE', "%{$buscar}%");
-        })
-        ->orWhere('apellido', 'LIKE', "%{$buscar}%")
-        ->orWhere('telefono', 'LIKE', "%{$buscar}%")
-        ->orWhere('direccion', 'LIKE', "%{$buscar}%")
-        ->orWhere('correo', 'LIKE', "%{$buscar}%")
-        ->orWhere('tipo', 'LIKE', "%{$buscar}%")
-        ->orWhere('fecha_inicio', 'LIKE', "%{$buscar}%")
-        ->orWhere('fecha_final', 'LIKE', "%{$buscar}%")
-        ->orWhere('fecha_nacimiento', 'LIKE', "%{$buscar}%")
-        ->paginate(20);
-
-        return view('catalogo.padrino.index', compact('datos'));
-    }
-
     public function padrino_index() {
-        $datos = Padrino::paginate(20);
-        return view('catalogo.padrino.index', compact('datos'));
+        return view('catalogo.padrino.index');
     }
 
     public function padrino_create() {
@@ -355,7 +266,8 @@ class CatalogoController extends Controller
         $barrios = Barrio::all();
         $metodos_pagos = MetodosPago::all();
         $bancos = Banco::all();
-        return view('catalogo.padrino.create', compact('provincias','cantones','barrios','metodos_pagos','bancos'));
+        $meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+        return view('catalogo.padrino.create', compact('provincias','cantones','barrios','metodos_pagos','bancos','meses'));
     }
 
     public function padrino_view($id) {
@@ -370,7 +282,8 @@ class CatalogoController extends Controller
         $barrios = Barrio::all();
         $metodos_pagos = MetodosPago::all();
         $bancos = Banco::all();
-        return view('catalogo.padrino.edit', compact('dato','provincias','cantones','barrios','metodos_pagos','bancos'));
+        $meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+        return view('catalogo.padrino.edit', compact('dato','provincias','cantones','barrios','metodos_pagos','bancos','meses'));
     }
 
     public function padrino_store(Request $request) {
@@ -383,7 +296,8 @@ class CatalogoController extends Controller
             'tipo' => 'required',
             'fecha_inicio' => 'required',
             'fecha_final' => 'required',
-            'fecha_nacimiento' => 'required',
+            'fecha_nacimiento' => 'nullable',
+            'mes_nacimiento' => 'nullable',
             'id_barrio' => 'required',
             'id_metodo_pago' => 'required',
             'id_banco' => 'required',
@@ -404,20 +318,21 @@ class CatalogoController extends Controller
         $padrino = Padrino::find($id);
         
         $padrino->update([
-            'nombre' => $request['nombre'] ? $request['nombre'] : $padrino['nombre'],
-            'apellido' => $request['apellido'] ? $request['apellido'] : $padrino['apellido'],
-            'telefono' => $request['telefono'] ? $request['telefono'] : $padrino['telefono'],
-            'direccion' => $request['direccion'] ? $request['direccion'] : $padrino['direccion'],
-            'correo' => $request['correo'] ? $request['correo'] : $padrino['correo'],
-            'tipo' => $request['tipo'] ? $request['tipo'] : $padrino['tipo'],
-            'fecha_inicio' => $request['fecha_inicio'] ? $request['fecha_inicio'] : $padrino['fecha_inicio'],
-            'fecha_final' => $request['fecha_final'] ? $request['fecha_final'] : $padrino['fecha_final'],
-            'fecha_nacimiento' => $request['fecha_nacimiento'] ? $request['fecha_nacimiento'] : $padrino['fecha_nacimiento'],
-            'id_provincia' => $request['id_provincia'] ? $request['id_provincia'] : $padrino['id_provincia'],
-            'id_canton' => $request['id_canton'] ? $request['id_canton'] : $padrino['id_canton'],
-            'id_barrio' => $request['id_barrio'] ? $request['id_barrio'] : $padrino['id_barrio'],
-            'id_metodo_pago' => $request['id_metodo_pago'] ? $request['id_metodo_pago'] : $padrino['id_metodo_pago'],
-            'id_banco' => $request['id_banco'] ? $request['id_banco'] : $padrino['id_banco'],
+            'nombre' => $request['nombre'] ?? $padrino['nombre'],
+            'apellido' => $request['apellido'] ?? $padrino['apellido'],
+            'telefono' => $request['telefono'] ?? $padrino['telefono'],
+            'direccion' => $request['direccion'] ?? $padrino['direccion'],
+            'correo' => $request['correo'] ?? $padrino['correo'],
+            'tipo' => $request['tipo'] ?? $padrino['tipo'],
+            'fecha_inicio' => $request['fecha_inicio'] ?? $padrino['fecha_inicio'],
+            'fecha_final' => $request['fecha_final'] ?? $padrino['fecha_final'],
+            'fecha_nacimiento' => $request['fecha_nacimiento'] ?? $padrino['fecha_nacimiento'] ?? null,
+            'mes_nacimiento' => $request['mes_nacimiento'] ?? $padrino['mes_nacimiento'] ?? null,
+            'id_provincia' => $request['id_provincia'] ?? $padrino['id_provincia'],
+            'id_canton' => $request['id_canton'] ?? $padrino['id_canton'],
+            'id_barrio' => $request['id_barrio'] ?? $padrino['id_barrio'],
+            'id_metodo_pago' => $request['id_metodo_pago'] ?? $padrino['id_metodo_pago'],
+            'id_banco' => $request['id_banco'] ?? $padrino['id_banco'],
         ]);
         
         $padrino->update([
@@ -427,41 +342,10 @@ class CatalogoController extends Controller
         
         return redirect('/padrinos')->with(['mensaje' => 'Información Actualizada']);
     }
-
+    
     /////// Evaluaciones médicas
-    public function evaluacion_medica_buscador_index(Request $request) {
-        $buscar = $request->buscar;
-
-        $datos = EvaluacionesMedica::with(['expedientes','clinicas'])
-        ->where('fecha', 'LIKE', "%{$buscar}%")
-        ->orWhereHas('expedientes', function ($query) use ($buscar) {
-            $terms = explode(' ', $buscar); // Divide el término de búsqueda en palabras
-            $query->where(function ($query) use ($terms) {
-                foreach ($terms as $term) {
-                    $query->where(function ($query) use ($term) {
-                        $query->where('nombre1', 'LIKE', "%{$term}%")
-                              ->orWhere('nombre2', 'LIKE', "%{$term}%")
-                              ->orWhere('apellido1', 'LIKE', "%{$term}%")
-                              ->orWhere('apellido2', 'LIKE', "%{$term}%");
-                    });
-                }
-            });
-        })
-        ->orWhereHas('clinicas', function ($query) use ($buscar) {
-            $query->where('clinica', 'LIKE', "%{$buscar}%");
-        })
-        ->orWhere('peso', 'LIKE', "%{$buscar}%")
-        ->orWhere('talla', 'LIKE', "%{$buscar}%")
-        ->orWhere('signos', 'LIKE', "%{$buscar}%")
-        ->orWhere('notas', 'LIKE', "%{$buscar}%")
-        ->paginate(20);
-
-        return view('catalogo.evaluaciones_medicas.index', compact('datos'));
-    }
-
     public function evaluacion_medica_index() {
-        $datos = EvaluacionesMedica::paginate(20);
-        return view('catalogo.evaluaciones_medicas.index', compact('datos'));
+        return view('catalogo.evaluaciones_medicas.index');
     }
 
     public function evaluacion_medica_create() {
@@ -625,50 +509,8 @@ class CatalogoController extends Controller
     }
     
     /////// Entregas mensuales
-    public function entrega_mensual_buscador_index(Request $request) {
-        $buscar = $request->buscar;
-
-        $datos = EntregasMensuale::with(['expedientes','padrinos','insumos'])
-        ->where('fecha', 'LIKE', "%{$buscar}%")
-        ->orWhereHas('expedientes', function ($query) use ($buscar) {
-            $terms = explode(' ', $buscar); // Divide el término de búsqueda en palabras
-            $query->where(function ($query) use ($terms) {
-                foreach ($terms as $term) {
-                    $query->where(function ($query) use ($term) {
-                        $query->where('nombre1', 'LIKE', "%{$term}%")
-                              ->orWhere('nombre2', 'LIKE', "%{$term}%")
-                              ->orWhere('apellido1', 'LIKE', "%{$term}%")
-                              ->orWhere('apellido2', 'LIKE', "%{$term}%");
-                    });
-                }
-            });
-        })
-        ->orWhereHas('padrinos', function ($query) use ($buscar) {
-            $terms = explode(' ', $buscar); // Divide el término de búsqueda en palabras
-            $query->where(function ($query) use ($terms) {
-                foreach ($terms as $term) {
-                    $query->where(function ($query) use ($term) {
-                        $query->where('nombre', 'LIKE', "%{$term}%")
-                              ->orWhere('apellido', 'LIKE', "%{$term}%");
-                    });
-                }
-            });
-        })
-        ->orWhereHas('insumos', function ($query) use ($buscar) {
-            $query->where('insumo', 'LIKE', "%{$buscar}%");
-        })
-        ->orWhere('observaciones', 'LIKE', "%{$buscar}%")
-        ->paginate(20);
-
-        $edades = $this->calcularEdades($datos);
-
-        return view('catalogo.entregas_mensuales.index', compact('datos','edades'));
-    }
-
     public function entrega_mensual_index() {
-        $datos = EntregasMensuale::paginate(20);
-        $edades = $this->calcularEdades($datos);
-        return view('catalogo.entregas_mensuales.index', compact('datos','edades'));
+        return view('catalogo.entregas_mensuales.index');
     }
 
     public function entrega_mensual_create() {
@@ -768,35 +610,8 @@ class CatalogoController extends Controller
     }
 
     /////// Cumpleaños
-    public function cumpleaño_buscador_index(Request $request) {
-        $buscar = $request->buscar;
-
-        $datos = Cumpleanio::with(['padrinos'])
-        ->where('fecha', 'LIKE', "%{$buscar}%")
-        ->orWhereHas('padrinos', function ($query) use ($buscar) {
-            $terms = explode(' ', $buscar); // Divide el término de búsqueda en palabras
-            $query->where(function ($query) use ($terms) {
-                foreach ($terms as $term) {
-                    $query->where(function ($query) use ($term) {
-                        $query->where('nombre', 'LIKE', "%{$term}%")
-                              ->orWhere('apellido', 'LIKE', "%{$term}%");
-                    });
-                }
-            });
-        })
-        ->orWhere('fecha_entrega_carta', 'LIKE', "%{$buscar}%")
-        ->orWhere('entrega_carta_presentacion', 'LIKE', "%{$buscar}%")
-        ->orWhere('entrega_regalo', 'LIKE', "%{$buscar}%")
-        ->orWhere('observaciones', 'LIKE', "%{$buscar}%")
-        ->orWhere('regalo', 'LIKE', "%{$buscar}%")
-        ->paginate(20);
-
-        return view('catalogo.cumple.index', compact('datos'));
-    }
-
     public function cumpleaño_index() {
-        $datos = Cumpleanio::paginate(20);
-        return view('catalogo.cumple.index', compact('datos'));
+        return view('catalogo.cumple.index');
     }
 
     public function cumpleaño_create() {
@@ -848,44 +663,8 @@ class CatalogoController extends Controller
     }
     
     /////// Notas
-    public function nota_buscador_index(Request $request) {
-        $buscar = $request->buscar;
-
-        $datos = Nota::with(['expedientes','grados_escolares','ocupa_tutorias','semaforos'])
-        ->where('promedio', 'LIKE', "%{$buscar}%")
-        ->orWhereHas('expedientes', function ($query) use ($buscar) {
-            $terms = explode(' ', $buscar); // Divide el término de búsqueda en palabras
-            $query->where(function ($query) use ($terms) {
-                foreach ($terms as $term) {
-                    $query->where(function ($query) use ($term) {
-                        $query->where('nombre1', 'LIKE', "%{$term}%")
-                              ->orWhere('nombre2', 'LIKE', "%{$term}%")
-                              ->orWhere('apellido1', 'LIKE', "%{$term}%")
-                              ->orWhere('apellido2', 'LIKE', "%{$term}%");
-                    });
-                }
-            });
-        })
-        ->orWhereHas('grados_escolares', function ($query) use ($buscar) {
-            $query->where('grado_escolar', 'LIKE', "%{$buscar}%");
-        })
-        ->orWhereHas('ocupa_tutorias', function ($query) use ($buscar) {
-            $query->where('ocupa_tutoria', 'LIKE', "%{$buscar}%");
-        })
-        ->orWhereHas('semaforos', function ($query) use ($buscar) {
-            $query->where('semaforo', 'LIKE', "%{$buscar}%");
-        })
-        ->orWhere('fecha', 'LIKE', "%{$buscar}%")
-        ->orWhere('tipo_promedio', 'LIKE', "%{$buscar}%")
-        ->orWhere('observaciones', 'LIKE', "%{$buscar}%")
-        ->paginate(20);
-
-        return view('catalogo.notas.index', compact('datos'));
-    }
-
     public function nota_index() {
-        $datos = Nota::paginate(20);
-        return view('catalogo.notas.index', compact('datos'));
+        return view('catalogo.notas.index');
     }
 
     public function nota_create() {
@@ -914,10 +693,10 @@ class CatalogoController extends Controller
         $request->validate([
             'id_expediente' => 'required',
             'promedio' => 'required',
-            'fecha' => 'required',
+            // 'fecha' => 'nullable',
             'id_grado_escolar' => 'required',
             'id_ocupa_tutoria' => 'required',
-            'tipo_promedio' => 'required',
+            // 'tipo_promedio' => 'nullable',
             'id_semaforo' => 'required',
         ]);
 
@@ -933,10 +712,10 @@ class CatalogoController extends Controller
         $notas->update([
             'id_expediente' => $request['id_expediente'] ? $request['id_expediente'] : $notas['id_expediente'],
             'promedio' => $request['promedio'] ? $request['promedio'] : $notas['promedio'],
-            'fecha' => $request['fecha'] ? $request['fecha'] : $notas['fecha'],
+            // 'fecha' => $request['fecha'] ? $request['fecha'] : $notas['fecha'],
             'id_grado_escolar' => $request['id_grado_escolar'] ? $request['id_grado_escolar'] : $notas['id_grado_escolar'],
             'id_ocupa_tutoria' => $request['id_ocupa_tutoria'] ? $request['id_ocupa_tutoria'] : $notas['id_ocupa_tutoria'],
-            'tipo_promedio' => $request['tipo_promedio'] ? $request['tipo_promedio'] : $notas['tipo_promedio'],
+            // 'tipo_promedio' => $request['tipo_promedio'] ? $request['tipo_promedio'] : $notas['tipo_promedio'],
             'id_semaforo' => $request['id_semaforo'] ? $request['id_semaforo'] : $notas['id_semaforo'],
         ]);
         
@@ -944,17 +723,8 @@ class CatalogoController extends Controller
     }
     
     /////// Insumos
-    public function insumo_buscador_index(Request $request) {
-        $buscar = $request->buscar;
-
-        $datos = Insumo::where('insumo', 'LIKE', "%{$buscar}%")->paginate(20);
-
-        return view('catalogo.insumo.index', compact('datos'));
-    }
-
     public function insumo_index() {
-        $datos = Insumo::paginate(20);
-        return view('catalogo.insumo.index', compact('datos'));
+        return view('catalogo.insumo.index');
     }
 
     public function insumo_create() {
@@ -993,17 +763,8 @@ class CatalogoController extends Controller
     }
     
     /////// Bancos
-    public function banco_buscador_index(Request $request) {
-        $buscar = $request->buscar;
-
-        $datos = Banco::where('banco', 'LIKE', "%{$buscar}%")->paginate(20);
-
-        return view('catalogo.banco.index', compact('datos'));
-    }
-
     public function banco_index() {
-        $datos = Banco::paginate(20);
-        return view('catalogo.banco.index', compact('datos'));
+        return view('catalogo.banco.index');
     }
 
     public function banco_create() {
@@ -1042,17 +803,8 @@ class CatalogoController extends Controller
     }
     
     /////// Becas
-    public function beca_buscador_index(Request $request) {
-        $buscar = $request->buscar;
-
-        $datos = Beca::where('beca', 'LIKE', "%{$buscar}%")->paginate(20);
-
-        return view('catalogo.becas.index', compact('datos'));
-    }
-
     public function beca_index() {
-        $datos = Beca::paginate(20);
-        return view('catalogo.becas.index', compact('datos'));
+        return view('catalogo.becas.index');
     }
 
     public function beca_create() {
@@ -1091,17 +843,8 @@ class CatalogoController extends Controller
     }
     
     /////// Centro educativo
-    public function centro_educativo_buscador_index(Request $request) {
-        $buscar = $request->buscar;
-
-        $datos = CentroEducativo::where('centro_educativo', 'LIKE', "%{$buscar}%")->paginate(20);
-
-        return view('catalogo.centro_educativo.index', compact('datos'));
-    }
-
     public function centro_educativo_index() {
-        $datos = CentroEducativo::paginate(20);
-        return view('catalogo.centro_educativo.index', compact('datos'));
+        return view('catalogo.centro_educativo.index');
     }
 
     public function centro_educativo_create() {
@@ -1140,17 +883,8 @@ class CatalogoController extends Controller
     }
     
     /////// Clinicas
-    public function clinica_buscador_index(Request $request) {
-        $buscar = $request->buscar;
-
-        $datos = Clinica::where('clinica', 'LIKE', "%{$buscar}%")->paginate(20);
-
-        return view('catalogo.clinica.index', compact('datos'));
-    }
-
     public function clinica_index() {
-        $datos = Clinica::paginate(20);
-        return view('catalogo.clinica.index', compact('datos'));
+        return view('catalogo.clinica.index');
     }
 
     public function clinica_create() {
@@ -1189,17 +923,8 @@ class CatalogoController extends Controller
     }
     
     /////// Comunidades
-    public function comunidad_buscador_index(Request $request) {
-        $buscar = $request->buscar;
-
-        $datos = Comunidad::where('comunidad', 'LIKE', "%{$buscar}%")->paginate(20);
-
-        return view('catalogo.comunidad.index', compact('datos'));
-    }
-
     public function comunidad_index() {
-        $datos = Comunidad::paginate(20);
-        return view('catalogo.comunidad.index', compact('datos'));
+        return view('catalogo.comunidad.index');
     }
 
     public function comunidad_create() {
@@ -1238,17 +963,8 @@ class CatalogoController extends Controller
     }
     
     /////// Especialidades
-    public function especialidad_buscador_index(Request $request) {
-        $buscar = $request->buscar;
-
-        $datos = Especialidad::where('especialidad', 'LIKE', "%{$buscar}%")->paginate(20);
-
-        return view('catalogo.especialidades.index', compact('datos'));
-    }
-
     public function especialidad_index() {
-        $datos = Especialidad::paginate(20);
-        return view('catalogo.especialidades.index', compact('datos'));
+        return view('catalogo.especialidades.index');
     }
 
     public function especialidad_create() {
@@ -1287,17 +1003,8 @@ class CatalogoController extends Controller
     }
     
     /////// Grados escolares
-    public function grado_escolar_buscador_index(Request $request) {
-        $buscar = $request->buscar;
-
-        $datos = GradosEscolare::where('grado_escolar', 'LIKE', "%{$buscar}%")->paginate(20);
-
-        return view('catalogo.grado_escolar.index', compact('datos'));
-    }
-
     public function grado_escolar_index() {
-        $datos = GradosEscolare::paginate(20);
-        return view('catalogo.grado_escolar.index', compact('datos'));
+        return view('catalogo.grado_escolar.index');
     }
 
     public function grado_escolar_create() {
@@ -1336,17 +1043,8 @@ class CatalogoController extends Controller
     }
     
     /////// Método de pago
-    public function metodo_de_pago_buscador_index(Request $request) {
-        $buscar = $request->buscar;
-
-        $datos = MetodosPago::where('metodo_pago', 'LIKE', "%{$buscar}%")->paginate(20);
-
-        return view('catalogo.metodos_pagos.index', compact('datos'));
-    }
-
     public function metodo_de_pago_index() {
-        $datos = MetodosPago::paginate(20);
-        return view('catalogo.metodos_pagos.index', compact('datos'));
+        return view('catalogo.metodos_pagos.index');
     }
 
     public function metodo_de_pago_create() {
@@ -1385,17 +1083,8 @@ class CatalogoController extends Controller
     }
     
     /////// Motivo de baja
-    public function motivo_de_baja_buscador_index(Request $request) {
-        $buscar = $request->buscar;
-
-        $datos = MotivoBaja::where('motivo_baja', 'LIKE', "%{$buscar}%")->paginate(20);
-
-        return view('catalogo.motivo_baja.index', compact('datos'));
-    }
-
     public function motivo_de_baja_index() {
-        $datos = MotivoBaja::paginate(20);
-        return view('catalogo.motivo_baja.index', compact('datos'));
+        return view('catalogo.motivo_baja.index');
     }
 
     public function motivo_de_baja_create() {
@@ -1434,17 +1123,8 @@ class CatalogoController extends Controller
     }
     
     /////// Provincias
-    public function provincia_buscador_index(Request $request) {
-        $buscar = $request->buscar;
-
-        $datos = Provincia::where('provincia', 'LIKE', "%{$buscar}%")->paginate(20);
-
-        return view('catalogo.provincia.index', compact('datos'));
-    }
-
     public function provincia_index() {
-        $datos = Provincia::paginate(20);
-        return view('catalogo.provincia.index', compact('datos'));
+        return view('catalogo.provincia.index');
     }
 
     public function provincia_create() {
@@ -1483,17 +1163,8 @@ class CatalogoController extends Controller
     }
     
     /////// Proyectos
-    public function proyecto_buscador_index(Request $request) {
-        $buscar = $request->buscar;
-
-        $datos = Proyecto::where('proyecto', 'LIKE', "%{$buscar}%")->paginate(20);
-
-        return view('catalogo.proyectos.index', compact('datos'));
-    }
-
     public function proyecto_index() {
-        $datos = Proyecto::paginate(20);
-        return view('catalogo.proyectos.index', compact('datos'));
+        return view('catalogo.proyectos.index');
     }
 
     public function proyecto_create() {
@@ -1532,17 +1203,8 @@ class CatalogoController extends Controller
     }
     
     /////// Tipo de asistencia
-    public function tipo_de_asistencia_buscador_index(Request $request) {
-        $buscar = $request->buscar;
-
-        $datos = TipoAsistencia::where('tipo_asistencia', 'LIKE', "%{$buscar}%")->paginate(20);
-
-        return view('catalogo.tipo_asistencia.index', compact('datos'));
-    }
-
     public function tipo_de_asistencia_index() {
-        $datos = TipoAsistencia::paginate(20);
-        return view('catalogo.tipo_asistencia.index', compact('datos'));
+        return view('catalogo.tipo_asistencia.index');
     }
 
     public function tipo_de_asistencia_create() {
@@ -1581,17 +1243,8 @@ class CatalogoController extends Controller
     }
     
     /////// Tipo de entrega
-    public function tipo_de_entrega_buscador_index(Request $request) {
-        $buscar = $request->buscar;
-
-        $datos = TipoEntrega::where('tipo_entrega', 'LIKE', "%{$buscar}%")->paginate(20);
-
-        return view('catalogo.tipo_entrega.index', compact('datos'));
-    }
-
     public function tipo_de_entrega_index() {
-        $datos = TipoEntrega::paginate(20);
-        return view('catalogo.tipo_entrega.index', compact('datos'));
+        return view('catalogo.tipo_entrega.index');
     }
 
     public function tipo_de_entrega_create() {
@@ -1630,17 +1283,8 @@ class CatalogoController extends Controller
     }
     
     /////// Tipo de pobreza
-    public function tipo_de_pobreza_buscador_index(Request $request) {
-        $buscar = $request->buscar;
-
-        $datos = TipoPobreza::where('tipo_pobreza', 'LIKE', "%{$buscar}%")->paginate(20);
-
-        return view('catalogo.tipo_pobreza.index', compact('datos'));
-    }
-
     public function tipo_de_pobreza_index() {
-        $datos = TipoPobreza::paginate(20);
-        return view('catalogo.tipo_pobreza.index', compact('datos'));
+        return view('catalogo.tipo_pobreza.index');
     }
 
     public function tipo_de_pobreza_create() {
@@ -1679,21 +1323,8 @@ class CatalogoController extends Controller
     }
     
     /////// Barrios
-    public function barrio_buscador_index(Request $request) {
-        $buscar = $request->buscar;
-
-        $datos = Barrio::with(['cantones'])
-        ->where('barrio', 'LIKE', "%{$buscar}%")
-        ->orWhereHas('cantones', function ($query) use ($buscar) {
-            $query->where('canton', 'LIKE', "%{$buscar}%");
-        })->paginate(20);
-
-        return view('catalogo.barrio.index', compact('datos'));
-    }
-
     public function barrio_index() {
-        $datos = Barrio::paginate(20);
-        return view('catalogo.barrio.index', compact('datos'));
+        return view('catalogo.barrio.index',);
     }
 
     public function barrio_create() {
@@ -1736,21 +1367,8 @@ class CatalogoController extends Controller
     }
     
     /////// Cantones
-    public function canton_buscador_index(Request $request) {
-        $buscar = $request->buscar;
-
-        $datos = Cantone::with(['provincias'])
-        ->where('canton', 'LIKE', "%{$buscar}%")
-        ->orWhereHas('provincias', function ($query) use ($buscar) {
-            $query->where('provincia', 'LIKE', "%{$buscar}%");
-        })->paginate(20);
-
-        return view('catalogo.canton.index', compact('datos'));
-    }
-
     public function canton_index() {
-        $datos = Cantone::paginate(20);
-        return view('catalogo.canton.index', compact('datos'));
+        return view('catalogo.canton.index');
     }
 
     public function canton_create() {
@@ -1793,17 +1411,8 @@ class CatalogoController extends Controller
     }
 
     /////// Estado
-    public function estado_buscador_index(Request $request) {
-        $buscar = $request->buscar;
-
-        $datos = Estado::where('estado', 'LIKE', "%{$buscar}%")->paginate(20);
-
-        return view('catalogo.estado.index', compact('datos'));
-    }
-
     public function estado_index() {
-        $datos = Estado::paginate(20);
-        return view('catalogo.estado.index', compact('datos'));
+        return view('catalogo.estado.index');
     }
 
     public function estado_create() {
@@ -1842,47 +1451,8 @@ class CatalogoController extends Controller
     }
 
     /////// Baja de padrino
-    public function baja_de_padrino_buscador_index(Request $request) {
-        $buscar = $request->buscar;
-
-        $datos = BajasPadrino::with(['padrinos','expedientes','motivo_bajas'])
-        ->where('fecha_baja', 'LIKE', "%{$buscar}%")
-        ->where('detalle_salida', 'LIKE', "%{$buscar}%")
-        ->orWhereHas('padrinos', function ($query) use ($buscar) {
-            $terms = explode(' ', $buscar); // Divide el término de búsqueda en palabras
-            $query->where(function ($query) use ($terms) {
-                foreach ($terms as $term) {
-                    $query->where(function ($query) use ($term) {
-                        $query->where('nombre', 'LIKE', "%{$term}%")
-                              ->orWhere('apellido', 'LIKE', "%{$term}%");
-                    });
-                }
-            });
-        })
-        ->orWhereHas('expedientes', function ($query) use ($buscar) {
-            $terms = explode(' ', $buscar); // Divide el término de búsqueda en palabras
-            $query->where(function ($query) use ($terms) {
-                foreach ($terms as $term) {
-                    $query->where(function ($query) use ($term) {
-                        $query->where('nombre1', 'LIKE', "%{$term}%")
-                              ->orWhere('nombre2', 'LIKE', "%{$term}%")
-                              ->orWhere('apellido1', 'LIKE', "%{$term}%")
-                              ->orWhere('apellido2', 'LIKE', "%{$term}%");
-                    });
-                }
-            });
-        })
-        ->orWhereHas('motivo_bajas', function ($query) use ($buscar) {
-            $query->where('motivo_baja', 'LIKE', "%{$buscar}%");
-        })
-        ->paginate(20);
-
-        return view('catalogo.baja_padrinos.index', compact('datos'));
-    }
-
     public function baja_de_padrino_index() {
-        $datos = BajasPadrino::paginate(20);
-        return view('catalogo.baja_padrinos.index', compact('datos'));
+        return view('catalogo.baja_padrinos.index');
     }
 
     public function baja_de_padrino_create() {
@@ -1935,29 +1505,8 @@ class CatalogoController extends Controller
     }
 
     /////// Actividades
-    public function actividad_buscador_index(Request $request) {
-        $buscar = $request->buscar;
-
-        $datos = Actividad::with(['tipo_asistencias','proyectos'])
-        ->where('actividad', 'LIKE', "%{$buscar}%")
-        ->orWhere('fecha_creacion', 'LIKE', "%{$buscar}%")
-        ->orWhere('fecha_actividad', 'LIKE', "%{$buscar}%")
-        ->orWhere('patrocinador', 'LIKE', "%{$buscar}%")
-        ->orWhere('observacion', 'LIKE', "%{$buscar}%")
-        ->orWhereHas('tipo_asistencias', function ($query) use ($buscar) {
-            $query->where('tipo_asistencia', 'LIKE', "%{$buscar}%");
-        })
-        ->orWhereHas('proyectos', function ($query) use ($buscar) {
-            $query->where('proyecto', 'LIKE', "%{$buscar}%");
-        })
-        ->paginate(20);
-
-        return view('catalogo.actividades.index', compact('datos'));
-    }
-
     public function actividad_index() {
-        $datos = Actividad::paginate(20);
-        return view('catalogo.actividades.index', compact('datos'));
+        return view('catalogo.actividades.index');
     }
 
     public function actividad_create() {
@@ -2027,32 +1576,7 @@ class CatalogoController extends Controller
     }
 
     public function detalle_actividad_create($id_a) {
-        $datos = [];
-        
-        $expedientes = Expediente::paginate(9);
-        foreach ($expedientes as $key => $expediente) {
-            $fecha = $expediente->fecha_nacimiento;
-
-            if (strtotime($expediente->fecha_nacimiento) !== false) {
-                // sacando edad del niño
-                $fechaCarbon = Carbon::parse($fecha);
-                $edad = Carbon::now()->year - $fechaCarbon->year;
-                
-                // saber si existe o no ese niño en la lista de la actividad
-                $existe_niño = DetalleActividad::where('id_expediente', $expediente->id)
-                ->where('id_actividad',$id_a)
-                ->exists();
-
-                $datos[] = [
-                    'id' => $expediente->id,
-                    'niño' => $expediente->nombre1 . ' ' . $expediente->nombre2 . ' ' . $expediente->apellido1 . ' ' . $expediente->apellido2,
-                    'edad' => $edad,
-                    'activo' => $existe_niño ? 1 : 0
-                ];
-            }
-        }
-
-        return view('catalogo.detalle_actividad.create', compact('id_a','datos','expedientes'));
+        return view('catalogo.detalle_actividad.create', compact('id_a'));
     }
 
     public function detalle_actividad_view($id, $id_a) {
@@ -2068,26 +1592,6 @@ class CatalogoController extends Controller
         return view('catalogo.detalle_actividad.edit', compact('dato','id_a','actividades','expedientes','semaforos'));
     }
 
-    public function detalle_actividad_store(Request $request, $id_a, $id_niño, $activo) {
-        $datos = DetalleActividad::where('id_actividad',$id_a)->get();
-        $hay_cupos = $this->cantidad_invitados($datos,$id_a);
-        if (!$hay_cupos) {
-            return redirect('actividades/detalles_actividades'.'/'.$id_a);
-        }
-        
-        if (!$activo) {
-            // Crear el registro en la base de datos
-            DetalleActividad::create([
-                'id_actividad' => $id_a,
-                'id_expediente' => $id_niño,
-                'asistencia' => 'Si',
-                'id_semaforo' => 1,
-            ]);
-
-            return redirect()->back()->with(['mensaje' => 'Agregado a la lista']);
-        }
-        return redirect()->back();
-    }
 
     public function detalle_actividad_update(Request $request, $id, $id_a) {
         $detalle_actividad = DetalleActividad::find($id);
@@ -2114,17 +1618,8 @@ class CatalogoController extends Controller
     }
 
     /////// Tutores
-    public function tutor_buscador_index(Request $request) {
-        $buscar = $request->buscar;
-
-        $datos = Tutor::where('tutor', 'LIKE', "%{$buscar}%")->paginate(20);
-
-        return view('catalogo.tutor.index', compact('datos'));
-    }
-
     public function tutor_index() {
-        $datos = Tutor::paginate(20);
-        return view('catalogo.tutor.index', compact('datos'));
+        return view('catalogo.tutor.index');
     }
 
     public function tutor_create() {
@@ -2163,41 +1658,8 @@ class CatalogoController extends Controller
     }
     
     /////// Tutorias
-    public function tutoria_buscador_index(Request $request) {
-        $buscar = $request->buscar;
-
-        $datos = Tutoria::with(['tutores','expedientes','comunidades','semaforos'])
-        ->where('promedio', 'LIKE', "%{$buscar}%")
-        ->orWhereHas('tutores', function ($query) use ($buscar) {
-            $query->where('tutor', 'LIKE', "%{$buscar}%");
-        })
-        ->orWhereHas('expedientes', function ($query) use ($buscar) {
-            $terms = explode(' ', $buscar); // Divide el término de búsqueda en palabras
-            $query->where(function ($query) use ($terms) {
-                foreach ($terms as $term) {
-                    $query->where(function ($query) use ($term) {
-                        $query->where('nombre1', 'LIKE', "%{$term}%")
-                              ->orWhere('nombre2', 'LIKE', "%{$term}%")
-                              ->orWhere('apellido1', 'LIKE', "%{$term}%")
-                              ->orWhere('apellido2', 'LIKE', "%{$term}%");
-                    });
-                }
-            });
-        })
-        ->orWhereHas('comunidades', function ($query) use ($buscar) {
-            $query->where('comunidad', 'LIKE', "%{$buscar}%");
-        })
-        ->orWhereHas('semaforos', function ($query) use ($buscar) {
-            $query->where('semaforo', 'LIKE', "%{$buscar}%");
-        })
-        ->paginate(20);
-
-        return view('catalogo.tutoria.index', compact('datos'));
-    }
-
     public function tutoria_index() {
-        $datos = Tutoria::paginate(20);
-        return view('catalogo.tutoria.index', compact('datos'));
+        return view('catalogo.tutoria.index');
     }
 
     public function tutoria_create() {
