@@ -2,7 +2,7 @@
 
 @extends('layout.plantilla_app')
 
-
+@section('informacion')
     <div class="encabezado-tabla">
         <p class="titulo">Notas</p>
 
